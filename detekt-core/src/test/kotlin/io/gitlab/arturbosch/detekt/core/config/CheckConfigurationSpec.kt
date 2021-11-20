@@ -2,6 +2,7 @@ package io.gitlab.arturbosch.detekt.core.config
 
 import io.github.detekt.test.utils.createTempDirectoryForTest
 import io.github.detekt.tooling.api.InvalidConfig
+import io.github.detekt.tooling.api.spec.ProcessingSpec
 import io.gitlab.arturbosch.detekt.api.Config
 import io.gitlab.arturbosch.detekt.api.ConfigValidator
 import io.gitlab.arturbosch.detekt.api.Notification
@@ -9,7 +10,9 @@ import io.gitlab.arturbosch.detekt.api.RuleSet
 import io.gitlab.arturbosch.detekt.api.RuleSetProvider
 import io.gitlab.arturbosch.detekt.api.internal.SimpleNotification
 import io.gitlab.arturbosch.detekt.core.createProcessingSettings
+import io.gitlab.arturbosch.detekt.core.tooling.getDefaultConfiguration
 import io.gitlab.arturbosch.detekt.test.yamlConfigFromContent
+import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThatCode
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
@@ -35,7 +38,7 @@ class SupportConfigValidationSpec : Spek({
             """
             )
             createProcessingSettings(testDir, config).use {
-                assertThatCode { checkConfiguration(it) }
+                assertThatCode { checkConfiguration(it, mockk<ProcessingSpec>().getDefaultConfiguration()) }
                     .isInstanceOf(InvalidConfig::class.java)
                     .hasMessageContaining("Run failed with 1 invalid config property.")
                     .hasMessageContaining("my_additional_properties")
@@ -53,7 +56,7 @@ class SupportConfigValidationSpec : Spek({
             """
             )
             createProcessingSettings(testDir, config).use {
-                assertThatCode { checkConfiguration(it) }
+                assertThatCode { checkConfiguration(it, mockk<ProcessingSpec>().getDefaultConfiguration()) }
                     .isInstanceOf(InvalidConfig::class.java)
                     .hasMessageContaining("Run failed with 1 invalid config property.")
             }
@@ -82,7 +85,8 @@ class SupportConfigValidationSpec : Spek({
             """
             )
             createProcessingSettings(testDir, config).use {
-                assertThatCode { checkConfiguration(it) }.doesNotThrowAnyException()
+                assertThatCode { checkConfiguration(it, mockk<ProcessingSpec>().getDefaultConfiguration()) }
+                    .doesNotThrowAnyException()
             }
         }
     }
